@@ -9,9 +9,32 @@ int main (int argc, char* argv){
 }
 
 int line( int x0, int x1, int y0, int y1, TGAImage &image, TGAColor color){
-    for (float t=0.; t<1.; t+=1){
-        int x = x0 + (x1-x0)*t;
-        int y = y0 + (y1-y0)*t;
-        image.set(x,y,color);
+    //use linear interpolation to find steps, make sure that x increases faster than y
+    //ensure that x0 < x
+    bool steep = false;
+    if(std::abs(x0-x1)< std::abs(y0-y1)){
+        std::swap(x0, y0);
+        std::swap(x1,y1);
+        steep = true;
+    }
+
+    if(x0 > x1){
+        std::swap(x0,x1);
+        std::swap(y0,y1);
+    }
+
+    int dx = x1-x0;
+    int dy = y1-y0;
+    float gradient = std::abs(dy/dx);
+    float ystep = 0;
+    int y = y0;
+    for (float x=x0; x<=x1; x++){
+        steep == false ? image.set(x,y,color): image.set(y,x,color);
+        ystep += gradient;
+        if (ystep>.5){
+            y += (y1>y0?1:-1);
+            ystep -= 1.;
+        }
     }
 }
+

@@ -1,6 +1,8 @@
 #include "tgaimage.h"
 #include "model.h"
 
+void line( int x0, int x1, int y0, int y1, TGAImage &image, TGAColor color);
+
 const TGAColor white = TGAColor(255,255,255,255);
 const TGAColor red = TGAColor(255,0,0,255);
 Model *model = NULL;
@@ -8,7 +10,7 @@ const int width = 800;
 const int height = 800;
 
 
-int main (int argc, char* argv){
+int main (int argc, char** argv){
         if (2==argc) {
         model = new Model(argv[1]);
     } else {
@@ -35,7 +37,7 @@ int main (int argc, char* argv){
     return 0;
 }
 
-int line( int x0, int x1, int y0, int y1, TGAImage &image, TGAColor color){
+void line( int x0, int x1, int y0, int y1, TGAImage &image, TGAColor color){
     //use linear interpolation to find steps, make sure that x increases faster than y
     //ensure that x0 < x
     bool steep = false;
@@ -52,16 +54,16 @@ int line( int x0, int x1, int y0, int y1, TGAImage &image, TGAColor color){
 
     int dx = x1-x0;
     int dy = y1-y0;
-    int dy_doubled = 2*dy; //remove floats
+    int difference = 2*dy-dx; //remove floats
     int ystep = 0;
     int y = y0;
     for (float x=x0; x<=x1; x++){
         steep == false ? image.set(x,y,color): image.set(y,x,color);
-        ystep += dy_doubled;
-        if (ystep> dx*2){
+        if (difference > ystep){
             y += (y1>y0?1:-1);
-            ystep -= 2*dx;
+            difference -= 2*dx;
         }
+        difference += 2*dy;
     }
 }
 
